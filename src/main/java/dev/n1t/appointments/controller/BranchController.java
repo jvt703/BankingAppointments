@@ -1,12 +1,13 @@
 package dev.n1t.appointments.controller;
 
+import dev.n1t.appointments.dto.OutgoingBranchDTO;
 import dev.n1t.appointments.service.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class BranchController {
@@ -14,11 +15,17 @@ public class BranchController {
 
     private final BranchService branchService;
 
-    @GetMapping(path = "/branch/all", produces = "application/json")
-    public List<OutgoingBranchDTO> getBranches(
+    @Autowired
+    public BranchController(BranchService branchService){
+        this.branchService = branchService;
+    }
 
+    @GetMapping(path = "/branch/all", produces = "application/json")
+    public ResponseEntity<List<OutgoingBranchDTO>>  getBranches(
+            @RequestParam Map<String, String> queryParams
     ){
-        return ResponseEntity.ok(branchService.getAllBranches());
+        List<OutgoingBranchDTO> response =  branchService.getAllBranches(queryParams);
+        return ResponseEntity.ok(response);
     };
 
     @GetMapping(path = "/branch/{branchId}", produces = "application/json")

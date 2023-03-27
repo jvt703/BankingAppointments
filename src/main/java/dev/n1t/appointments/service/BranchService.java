@@ -1,8 +1,10 @@
 package dev.n1t.appointments.service;
 
+import dev.n1t.appointments.dto.OutgoingBranchDTO;
 import dev.n1t.appointments.repository.BranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,46 +12,49 @@ import java.util.stream.Stream;
 
 public class BranchService {
 
+
+
     @Autowired
     private BranchRepository branchRepository;
-  public List<OutgoingBranchDTO> getAllBranches(Map<String, String> queryParams){
-      List<Branch> branchList = branchRepository.findAll();
-      //we find all to get List<Branch> then convert that to an OUtgoing Branch DTO and return that
-      Long id = null;
-      String PhoneNumber = null;
-      String Name = null;
-      if (queryParams.containsKey("id")) {
-          id = Long.parseLong(queryParams.get("id"));
-      }
+    public List<OutgoingBranchDTO> getAllBranches(Map<String, String> queryParams) {
+        try {
+            Long id = null;
+            String name = null;
 
-      if (queryParams.containsKey("Name")) {
-          Name = queryParams.get("Name");
-      }
+            if (queryParams.containsKey("id")) {
+                id = Long.parseLong(queryParams.get("id"));
+            }
 
-      //
-    List<Branch> branches = branchRepository.findAllByQueryParams(
-            id,Name
-    );
+            if (queryParams.containsKey("name")) {
+                name = queryParams.get("name");
+            }
 
-
-      return branches.stream().map(OutgoingBranchDTO::new).collect(Collectors.toList());
-
-
-  };
-
-
-
-
-
-    public OutgoingBranchDTO getBranchByID(){
-
-      return OutgoingBranchDTO();
-  }
-
-    public OutgoingBranchDTO getBranchesByName(){
-
-        return OutgoingBranchDTO();
+            List<Branch> branches = branchRepository.findAllByQueryParams(id, name);
+            return branches.stream().map(OutgoingBranchDTO::new).collect(Collectors.toList());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid ID parameter", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting branches", e);
+        }
     }
+
+
+
+
+
+    public OutgoingBranchDTO getBranchById(long branchId) {
+        try {
+            Optional<Branch> branch = branchRepository.findById(branchId);
+            if (branch.isPresent()) {
+                return new OutgoingBranchDTO(branch.get());
+            } else {
+                throw new BranchNotFoundException("Branch with ID " + branchId + " not found");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting branch with ID " + branchId, e);
+        }
+    }
+
 
 
 

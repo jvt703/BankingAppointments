@@ -13,7 +13,10 @@ public class OutgoingBranchDTO {
         this.id = branch.getId();
         this.Name = branch.getName();
         this.PhoneNumber = branch.getPhoneNumber();
-        this.Address = branch.getAddress().getCity() + branch.getAddress().getState();
+        this.Address = new AddressDTO(branch.getAddress().getCity()
+                , branch.getAddress().getStreet()
+                , branch.getAddress().getState()
+                ,branch.getAddress().getZipCode());
 
     }
 
