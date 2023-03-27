@@ -1,10 +1,12 @@
 package dev.n1t.appointments.dto;
 
+import dev.n1t.model.Branch;
+
 public class OutgoingBranchDTO {
     private Long id;
     private String Name;
 
-    private String Address;
+    private AddressDTO Address;
 
     private String PhoneNumber;
 

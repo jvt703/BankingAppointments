@@ -1,0 +1,6 @@
+[submodule "src/main/java/dev/n1t/model-submodule"]
+	path = src/main/java/dev/n1t/model-submodule
+	url = https://git1.smoothstack.com/cohorts/2023/organizations/number-1-team/api/model-submodule.git
+[submodule "src/main/java/dev/n1t/model"]
+	path = src/main/java/dev/n1t/model
+	url = https://git1.smoothstack.com/cohorts/2023/organizations/number-1-team/submodules/model.git

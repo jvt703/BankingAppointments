@@ -1,7 +1,9 @@
 package dev.n1t.appointments.service;
 
 import dev.n1t.appointments.dto.OutgoingBranchDTO;
+import dev.n1t.appointments.exception.BranchNotFoundException;
 import dev.n1t.appointments.repository.BranchRepository;
+import dev.n1t.model.Branch;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

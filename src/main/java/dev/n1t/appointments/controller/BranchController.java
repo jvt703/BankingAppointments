@@ -29,9 +29,9 @@ public class BranchController {
     };
 
     @GetMapping(path = "/branch/{branchId}", produces = "application/json")
-    public List<OutgoingBranchDTO> getBranches(
-
+    public ResponseEntity<OutgoingBranchDTO> getBranchById(
+            @PathVariable(value = "branchId") long branchId
     ){
-        return ResponseEntity.ok(branchService.getBrancheByID());
+        return ResponseEntity.ok(branchService.getBranchById(branchId));
     };
 }
