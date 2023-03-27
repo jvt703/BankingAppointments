@@ -1,7 +1,11 @@
 package dev.n1t.appointments.dto;
 
 import dev.n1t.model.Branch;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class OutgoingBranchDTO {
     private Long id;
     private String Name;
