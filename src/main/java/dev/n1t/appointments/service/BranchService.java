@@ -67,10 +67,10 @@ public class BranchService {
     public OutgoingBranchDTO createBranch(BranchRegistrationDTO branchRegistrationDTO) {
 
         var address = Address.builder()
-                .city(branchRegistrationDTO.getAddress().getCity())
-                .state(branchRegistrationDTO.getAddress().getState())
-                .street(branchRegistrationDTO.getAddress().getStreet())
-                .zipCode(branchRegistrationDTO.getAddress().getZipCode())
+                .city(branchRegistrationDTO.getCity())
+                .state(branchRegistrationDTO.getState())
+                .street(branchRegistrationDTO.getStreet())
+                .zipCode(branchRegistrationDTO.getZipCode())
                 .build();
         Address addressSaved = addressRepository.save(address);
 
