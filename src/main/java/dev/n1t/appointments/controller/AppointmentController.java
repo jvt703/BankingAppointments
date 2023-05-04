@@ -41,15 +41,17 @@ public class AppointmentController {
            @RequestBody AppointmentRegistrationDTO appointmentDTO
     ) {
         OutgoingAppointmentDTO response = appointmentService.createAppointment(appointmentDTO);
-        System.out.println("here2");
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(path = "/{appointmentId}")
+    @DeleteMapping(path = "/user/{userId}/{appointmentId}")
     public ResponseEntity<OutgoingAppointmentDTO> deleteAppointment(
-            @PathVariable(value = "appointmentId") Long appointmentId
+            @PathVariable(value = "appointmentId") Long appointmentId,
+            @PathVariable(value = "userId") Integer userId
     ) {
-        OutgoingAppointmentDTO response = appointmentService.deleteAppointment(appointmentId);
+        OutgoingAppointmentDTO response = appointmentService.deleteAppointment(appointmentId,userId);
         return ResponseEntity.ok(response);
     }
+
+
 }

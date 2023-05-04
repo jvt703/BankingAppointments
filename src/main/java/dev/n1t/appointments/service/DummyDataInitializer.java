@@ -60,6 +60,11 @@ private final UserRepository userRepository;
                     .description("Deposit Cash")
                     .build();
         ServiceType outputServiceType = serviceTypeRepository.save(serviceType);
+            ServiceType serviceType2 = ServiceType.builder()
+                    .typeName("Account Help")
+                    .description("In Person Account Help")
+                    .build();
+            ServiceType outputServiceType2 = serviceTypeRepository.save(serviceType2);
         User inputUser = User.builder()
                     .active(true)
                     .email("mario.mario@email.com")

@@ -3,6 +3,7 @@ package dev.n1t.appointments.service;
 
 import dev.n1t.appointments.dto.AppointmentRegistrationDTO;
 import dev.n1t.appointments.dto.OutgoingAppointmentDTO;
+import dev.n1t.appointments.exception.AppointmentDoesNotBelongToUserException;
 import dev.n1t.appointments.exception.AppointmentNotFoundException;
 import dev.n1t.appointments.exception.UserNotFoundException;
 import dev.n1t.appointments.repository.AppointmentRepository;
@@ -10,11 +11,13 @@ import dev.n1t.appointments.repository.BranchRepository;
 import dev.n1t.appointments.repository.ServiceTypeRepository;
 import dev.n1t.appointments.repository.UserRepository;
 import dev.n1t.model.Appointment;
+import dev.n1t.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +44,7 @@ public class AppointmentService {
     public OutgoingAppointmentDTO getAppointmentById(long appointmentId) {
         try {
             Appointment appointment = appointmentRepository.findById(appointmentId)
-                    .orElseThrow(() -> new AppointmentNotFoundException());
+                    .orElseThrow(() -> new AppointmentNotFoundException(appointmentId));
             return new OutgoingAppointmentDTO(appointment);
         } catch (Exception e) {
             throw new RuntimeException("Error getting appointment with ID " + appointmentId, e);
@@ -55,7 +58,7 @@ public class AppointmentService {
         try {
             Appointment appointment = Appointment.builder()
                     .user(userRepository.findById(appointmentDTO.getUserId())
-                            .orElseThrow(() -> new UserNotFoundException(String.valueOf(appointmentDTO.getUserId()))))
+                            .orElseThrow(() -> new UserNotFoundException(appointmentDTO.getUserId())))
                     .branch( branchRepository.findById(appointmentDTO.getBranchId()).get())
                     .appointmentDateTime(appointmentDTO.getAppointmentDateTime())
                     .banker(userRepository.findById(appointmentDTO.getBankerId()).get())
@@ -63,11 +66,7 @@ public class AppointmentService {
                     .active(true)
                     .build();
             Appointment createdAppointment = appointmentRepository.save(appointment);
-            System.out.println(createdAppointment.getAppointmentDateTime());
-            System.out.println(createdAppointment.getId());
-            System.out.println(createdAppointment.getUser());
-            System.out.println(createdAppointment.getServiceType());
-            System.out.println("here");
+
             return new OutgoingAppointmentDTO(createdAppointment);
         } catch (Exception e) {
             throw new RuntimeException("Error creating appointment", e);
@@ -75,15 +74,17 @@ public class AppointmentService {
     }
 
     @Transactional
-    public OutgoingAppointmentDTO deleteAppointment(Long appointmentId) {
-        try {
-            Appointment appointment = appointmentRepository.findById(appointmentId)
-                    .orElseThrow(() -> new AppointmentNotFoundException());
-            appointmentRepository.delete(appointment);
-            return new OutgoingAppointmentDTO(appointment);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting appointment with ID " + appointmentId, e);
-        }
+    public OutgoingAppointmentDTO deleteAppointment(Long appointmentId, Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+        Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+        if (user.isPresent()) {
+            if (appointment.isPresent()) {
+                if (appointment.get().getUser().equals(user.get())){
+                    appointmentRepository.delete(appointment.get());}
+                else throw new AppointmentDoesNotBelongToUserException(appointmentId,userId);
+            } else throw new AppointmentNotFoundException(appointmentId);
+        } else throw new UserNotFoundException(userId);
+        return new OutgoingAppointmentDTO(appointment.get());
     }
 
 //    @Transactional
