@@ -18,7 +18,7 @@ public class AppointmentRegistrationDTO {
 
     private Long appointmentDateTime;
 
-    private Long bankerId;
+    private int bankerId;
 
     private Long serviceTypeId;
 

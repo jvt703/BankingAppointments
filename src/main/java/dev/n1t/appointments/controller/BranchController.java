@@ -3,6 +3,7 @@ package dev.n1t.appointments.controller;
 import dev.n1t.appointments.dto.BranchRegistrationDTO;
 import dev.n1t.appointments.dto.OutgoingBranchDTO;
 import dev.n1t.appointments.service.BranchService;
+import dev.n1t.appointments.service.DummyDataInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,13 +15,15 @@ import java.util.Map;
 @RestController
 public class BranchController {
 
-
+    @Autowired
+    private final DummyDataInitializer dummyDataInitializer;
     private final BranchService branchService;
 
 
     @Autowired
-    public BranchController(BranchService branchService){
+    public BranchController(BranchService branchService, DummyDataInitializer dummyDataInitializer){
         this.branchService = branchService;
+        this.dummyDataInitializer = dummyDataInitializer;
     }
 
     @GetMapping(path = "/branch/all", produces = "application/json")

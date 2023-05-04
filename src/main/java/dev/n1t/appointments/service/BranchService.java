@@ -8,7 +8,9 @@ import dev.n1t.appointments.repository.AddressRepository;
 import dev.n1t.appointments.repository.BranchRepository;
 import dev.n1t.model.Address;
 import dev.n1t.model.Branch;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,9 +19,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Service
 public class BranchService {
-
-
 
     @Autowired
     private BranchRepository branchRepository;

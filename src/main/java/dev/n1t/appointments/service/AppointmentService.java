@@ -1,11 +1,13 @@
 package dev.n1t.appointments.service;
 
-import dev.n1t.appointments.dto.AppointmentDTO;
+
 import dev.n1t.appointments.dto.AppointmentRegistrationDTO;
 import dev.n1t.appointments.dto.OutgoingAppointmentDTO;
 import dev.n1t.appointments.exception.AppointmentNotFoundException;
 import dev.n1t.appointments.exception.UserNotFoundException;
 import dev.n1t.appointments.repository.AppointmentRepository;
+import dev.n1t.appointments.repository.BranchRepository;
+import dev.n1t.appointments.repository.ServiceTypeRepository;
 import dev.n1t.appointments.repository.UserRepository;
 import dev.n1t.model.Appointment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,11 @@ public class AppointmentService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
+    @Autowired
+    private BranchRepository branchRepository;
     public List<OutgoingAppointmentDTO> getAllAppointments() {
         try {
             List<Appointment> appointments = appointmentRepository.findAll();
@@ -34,7 +41,7 @@ public class AppointmentService {
     public OutgoingAppointmentDTO getAppointmentById(long appointmentId) {
         try {
             Appointment appointment = appointmentRepository.findById(appointmentId)
-                    .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID " + appointmentId + " not found"));
+                    .orElseThrow(() -> new AppointmentNotFoundException());
             return new OutgoingAppointmentDTO(appointment);
         } catch (Exception e) {
             throw new RuntimeException("Error getting appointment with ID " + appointmentId, e);
@@ -46,49 +53,49 @@ public class AppointmentService {
         try {
             Appointment appointment = Appointment.builder()
                     .user(userRepository.findById(appointmentDTO.getUserId())
-                            .orElseThrow(() -> new UserNotFoundException(String.valueOf(appointmentDTO.getUserId())))
-                    .branch(appointmentDTO.getBranch())
+                            .orElseThrow(() -> new UserNotFoundException(String.valueOf(appointmentDTO.getUserId()))))
+                    .branch( branchRepository.findById(appointmentDTO.getBranchId()).get())
                     .appointmentDateTime(appointmentDTO.getAppointmentDateTime())
-                    .banker(appointmentDTO.getBanker())
-                    .serviceType(appointmentDTO.getServiceType())
-                    .active(appointmentDTO.isActive())
+                    .banker(userRepository.findById(appointmentDTO.getBankerId()).get())
+                    .serviceType(serviceTypeRepository.findById(appointmentDTO.getServiceTypeId()).get())
+                    .active(true)
                     .build();
             Appointment createdAppointment = appointmentRepository.save(appointment);
-            return new AppointmentDTO(createdAppointment);
+            return new OutgoingAppointmentDTO(createdAppointment);
         } catch (Exception e) {
             throw new RuntimeException("Error creating appointment", e);
         }
     }
 
     @Transactional
-    public AppointmentDTO deleteAppointment(Long appointmentId) {
+    public OutgoingAppointmentDTO deleteAppointment(Long appointmentId) {
         try {
             Appointment appointment = appointmentRepository.findById(appointmentId)
-                    .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID " + appointmentId + " not found"));
+                    .orElseThrow(() -> new AppointmentNotFoundException());
             appointmentRepository.delete(appointment);
-            return new AppointmentDTO(appointment);
+            return new OutgoingAppointmentDTO(appointment);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting appointment with ID " + appointmentId, e);
         }
     }
 
-    @Transactional
-    public AppointmentDTO updateAppointment(AppointmentDTO appointmentDTO) {
-        try {
-            Appointment appointment = appointmentRepository.findById(appointmentDTO.getId())
-                    .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID " + appointmentDTO.getId() + " not found"));
-
-            appointment.setUser(appointmentDTO.getUser());
-            appointment.setBranch(appointmentDTO.getBranch());
-            appointment.setAppointmentDateTime(appointmentDTO.getAppointmentDateTime());
-            appointment.setBanker(appointmentDTO.getBanker());
-            appointment.setServiceType(appointmentDTO.getServiceType());
-            appointment.setActive(appointmentDTO.isActive());
-
-            Appointment updatedAppointment = appointmentRepository.save(appointment);
-            return new AppointmentDTO(updatedAppointment);
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating appointment with ID " + appointmentDTO.getId(), e);
-        }
-    }
+//    @Transactional
+//    public OutgoingAppointmentDTO updateAppointment(AppointmentDTO appointmentDTO) {
+//        try {
+//            Appointment appointment = appointmentRepository.findById(appointmentDTO.getId())
+//                    .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID " + appointmentDTO.getId() + " not found"));
+//
+//            appointment.setUser(appointmentDTO.getUser());
+//            appointment.setBranch(appointmentDTO.getBranch());
+//            appointment.setAppointmentDateTime(appointmentDTO.getAppointmentDateTime());
+//            appointment.setBanker(appointmentDTO.getBanker());
+//            appointment.setServiceType(appointmentDTO.getServiceType());
+//            appointment.setActive(appointmentDTO.isActive());
+//
+//            Appointment updatedAppointment = appointmentRepository.save(appointment);
+//            return new AppointmentDTO(updatedAppointment);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Error updating appointment with ID " + appointmentDTO.getId(), e);
+//        }
+//    }
 }

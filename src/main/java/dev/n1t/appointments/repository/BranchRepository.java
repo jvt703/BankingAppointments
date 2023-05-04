@@ -7,14 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-@Repository
+
 public interface BranchRepository extends JpaRepository<Branch, Long> {
-    List<Branch> findAll(Branch branch);
-    @Query ("SELECT a FROM Branch a WHERE "
-         + "(:id IS NULL OR a.id = :id) "
-         + "AND (:Name IS NULL OR a.branch.name LIKE %:Name%) ")
+    List<Branch> findAll();
+    @Query("SELECT b FROM Branch b WHERE "
+            + "(:id IS NULL OR b.id = :id) "
+            + "AND (:name IS NULL OR b.name LIKE %:name%)")
     List<Branch> findAllByQueryParams(
-            @Param("id") Long id, @Param("Name") String Name);
-
-
+            @Param("id") Long id,
+            @Param("name") String name);
 }
