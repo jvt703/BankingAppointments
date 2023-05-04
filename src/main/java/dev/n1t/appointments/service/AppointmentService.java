@@ -50,6 +50,8 @@ public class AppointmentService {
 // need to add branch repostiory to get and add the ranch
     @Transactional
     public OutgoingAppointmentDTO createAppointment(AppointmentRegistrationDTO appointmentDTO) {
+
+
         try {
             Appointment appointment = Appointment.builder()
                     .user(userRepository.findById(appointmentDTO.getUserId())
@@ -61,6 +63,11 @@ public class AppointmentService {
                     .active(true)
                     .build();
             Appointment createdAppointment = appointmentRepository.save(appointment);
+            System.out.println(createdAppointment.getAppointmentDateTime());
+            System.out.println(createdAppointment.getId());
+            System.out.println(createdAppointment.getUser());
+            System.out.println(createdAppointment.getServiceType());
+            System.out.println("here");
             return new OutgoingAppointmentDTO(createdAppointment);
         } catch (Exception e) {
             throw new RuntimeException("Error creating appointment", e);

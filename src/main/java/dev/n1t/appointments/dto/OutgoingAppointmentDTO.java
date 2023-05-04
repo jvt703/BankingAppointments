@@ -1,7 +1,15 @@
 package dev.n1t.appointments.dto;
 
 import dev.n1t.model.Appointment;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OutgoingAppointmentDTO {
     private Long userId;
 
