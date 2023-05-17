@@ -12,7 +12,6 @@ import lombok.*;
 public class OutgoingBranchDTO {
     private Long id;
     private String Name;
-
     private AddressDTO Address;
 
     private String PhoneNumber;

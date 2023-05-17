@@ -5,12 +5,13 @@ import dev.n1t.appointments.dto.AppointmentRegistrationDTO;
 import dev.n1t.appointments.dto.OutgoingAppointmentDTO;
 import dev.n1t.appointments.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/appointments")
 public class AppointmentController {
@@ -35,6 +36,13 @@ public class AppointmentController {
         OutgoingAppointmentDTO response = appointmentService.getAppointmentById(appointmentId);
         return ResponseEntity.ok(response);
     }
+    @GetMapping(path = "/user/{userId}", produces = "application/json")
+    public ResponseEntity<List<OutgoingAppointmentDTO>> getAppointmentsByUserId(
+            @PathVariable(value = "userId") Long userId
+    ) {
+        List<OutgoingAppointmentDTO> response = appointmentService.getAppointmentsByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping(path = "/create", produces = "application/json")
     public ResponseEntity<OutgoingAppointmentDTO> createAppointment(
@@ -53,5 +61,14 @@ public class AppointmentController {
         return ResponseEntity.ok(response);
     }
 
-
+    @GetMapping(path = "/byBranchAndDate", produces = "application/json")
+    public ResponseEntity<List<OutgoingAppointmentDTO>> getAppointmentsByBranchAndDate(
+            @RequestParam(value = "branchId") Long branchId,
+            @RequestParam(value = "startDateTime") Long startDateTime,
+            @RequestParam(value = "endDateTime") Long endDateTime,
+            @RequestHeader("Origin") String origin
+    ) {
+        List<OutgoingAppointmentDTO> response = appointmentService.getAppointmentsByBranchAndTimeRange(branchId, startDateTime, endDateTime);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -5,6 +5,7 @@ import dev.n1t.appointments.dto.AppointmentRegistrationDTO;
 import dev.n1t.appointments.dto.OutgoingAppointmentDTO;
 import dev.n1t.appointments.exception.AppointmentDoesNotBelongToUserException;
 import dev.n1t.appointments.exception.AppointmentNotFoundException;
+import dev.n1t.appointments.exception.InvalidAppointmentTimeException;
 import dev.n1t.appointments.exception.UserNotFoundException;
 import dev.n1t.appointments.repository.AppointmentRepository;
 import dev.n1t.appointments.repository.BranchRepository;
@@ -51,11 +52,50 @@ public class AppointmentService {
         }
     }
 // need to add branch repostiory to get and add the ranch
+
+    public List<OutgoingAppointmentDTO> getAppointmentsByUserId(Long userId) {
+        try {
+            List<Appointment> appointments = appointmentRepository.findByUserId((userId));
+            List<OutgoingAppointmentDTO> outgoingAppointments = appointments.stream()
+                    .map(OutgoingAppointmentDTO::new)
+                    .collect(Collectors.toList());
+            return outgoingAppointments;
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting appointments for user with ID " + userId, e);
+        }
+    }
+
+    public List<OutgoingAppointmentDTO> getAppointmentsByBranchAndTimeRange(Long branchId, Long startTime, Long endTime) {
+        try {
+            List<Appointment> appointments = appointmentRepository.findByBranchAndAppointmentDateTimeWithinRange(branchId, startTime, endTime);
+            List<OutgoingAppointmentDTO> outgoingAppointments = appointments.stream()
+                    .map(OutgoingAppointmentDTO::new)
+                    .collect(Collectors.toList());
+            return outgoingAppointments;
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting appointments for branch with ID " + branchId, e);
+        }
+    }
+
+    public boolean hasAppointmentsWithin30Mins(Long branchId, Long appointmentDateTime) {
+        Long startTime = appointmentDateTime - 30 * 60 ;
+        Long endTime = appointmentDateTime + 30 * 60 ;
+        System.out.println(startTime +"start");
+        System.out.println(endTime + "end");
+        System.out.println("appointmentTime" + appointmentDateTime);
+        List<Appointment> appointments = appointmentRepository.findByBranchAndAppointmentDateTimeWithinRange(branchId, startTime, endTime);
+        System.out.println(appointments.toString());
+
+        return appointments.isEmpty();
+    }
     @Transactional
     public OutgoingAppointmentDTO createAppointment(AppointmentRegistrationDTO appointmentDTO) {
+        System.out.println(appointmentDTO.getBranchId());
+        System.out.println(appointmentDTO.getAppointmentDateTime());
 
-
-        try {
+        //before we create we must find with same branch and time
+       boolean timeIsValid = hasAppointmentsWithin30Mins(appointmentDTO.getBranchId(), appointmentDTO.getAppointmentDateTime());
+        if(timeIsValid){
             Appointment appointment = Appointment.builder()
                     .user(userRepository.findById(appointmentDTO.getUserId())
                             .orElseThrow(() -> new UserNotFoundException(appointmentDTO.getUserId())))
@@ -66,11 +106,9 @@ public class AppointmentService {
                     .active(true)
                     .build();
             Appointment createdAppointment = appointmentRepository.save(appointment);
-
             return new OutgoingAppointmentDTO(createdAppointment);
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating appointment", e);
         }
+        else throw new InvalidAppointmentTimeException(appointmentDTO.getAppointmentDateTime());
     }
 
     @Transactional

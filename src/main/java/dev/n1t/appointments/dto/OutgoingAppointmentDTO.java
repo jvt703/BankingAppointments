@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OutgoingAppointmentDTO {
     private int userId;
-
+    private Long appointmentId;
     private String branchName;
 
     private Long appointmentDateTime;
@@ -21,6 +21,7 @@ public class OutgoingAppointmentDTO {
 
     private String serviceTypeName;
     public OutgoingAppointmentDTO(Appointment appointment){
+        this.appointmentId = appointment.getId();
         this.userId = appointment.getUser().getId();
         this.branchName = appointment.getBranch().getName();
         this.appointmentDateTime = appointment.getAppointmentDateTime();
