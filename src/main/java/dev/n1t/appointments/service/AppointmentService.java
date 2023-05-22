@@ -80,9 +80,6 @@ public class AppointmentService {
     public boolean hasAppointmentsWithin30Mins(Long branchId, Long appointmentDateTime) {
         Long startTime = appointmentDateTime - 30 * 60 ;
         Long endTime = appointmentDateTime + 30 * 60 ;
-        System.out.println(startTime +"start");
-        System.out.println(endTime + "end");
-        System.out.println("appointmentTime" + appointmentDateTime);
         List<Appointment> appointments = appointmentRepository.findByBranchAndAppointmentDateTimeWithinRange(branchId, startTime, endTime);
         System.out.println(appointments.toString());
 
